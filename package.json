@@ -1,0 +1,11 @@
+{
+	"name": "@device.farm/si-stm32-i2c",
+	"version": "1.0.0",
+	"dependencies": {
+	},
+	"silicon": {
+		"sources": [
+			"src/i2c-hw-master.cpp"
+		]
+	}
+}
