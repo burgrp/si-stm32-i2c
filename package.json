@@ -2,10 +2,11 @@
 	"name": "@device.farm/si-stm32-i2c",
 	"version": "1.0.0",
 	"dependencies": {
+		"@device.farm/si-application-events": "1.0.0"
 	},
 	"silicon": {
 		"sources": [
-			"src/i2c-hw-master.cpp"
+			"i2c-hw-master.cpp"
 		]
 	}
 }
