@@ -1,6 +1,6 @@
 {
 	"name": "@device.farm/si-stm32-i2c",
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"dependencies": {
 		"@device.farm/si-application-events": "1.0.0"
 	},
