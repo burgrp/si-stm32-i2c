@@ -5,7 +5,8 @@ namespace i2c {
 
         protected:
             target::i2c::Peripheral* peripheral;            
-            int index;
+            int indexRx;
+            int indexTx;
             int afterWriteEventId;
 
         public:
@@ -24,21 +25,6 @@ namespace i2c {
 
                 afterWriteEventId = applicationEvents::createEventId();
                 handle(afterWriteEventId);
-
-/*                
-                peripheral->TIMINGR.setPRESC(1);
-                peripheral->TIMINGR.setSCLL(0xC7);
-                peripheral->TIMINGR.setSCLH(0xC3);
-                peripheral->TIMINGR.setSDADEL(0x02);
-                peripheral->TIMINGR.setSCLDEL(0x04);
-                peripheral->CR2.setAUTOEND(1);
-                peripheral->CR1.setRXIE(1);
-                peripheral->CR1.setTXIE(1);
-                peripheral->CR1.setSTOPIE(1);
-                peripheral->CR1.setPE(1);
-                stopEventId = applicationEvents::createEventId();
-                handle(stopEventId);
-                */
             }
             
             virtual void onEvent() {
@@ -49,23 +35,23 @@ namespace i2c {
 
                 if (peripheral->ISR.getADDR()) {
                     peripheral->ICR.setADDRCF(1);
-                    index = 0;
+                    indexRx = 0;
+                    indexTx = 0;
                     peripheral->ISR.setTXE(1); // clear TX buffer
                 }
 
                 if (peripheral->ISR.getRXNE()) {
                     int byte = peripheral->RXDR.getRXDATA();
-                    onRx(byte, index++);
+                    onRx(byte, indexRx++);
                 }
 
                 if (peripheral->ISR.getTXE()) {                                        
-                    peripheral->TXDR.setTXDATA(onTx(index));
-                    index++;
+                    peripheral->TXDR.setTXDATA(onTx(indexTx++));
                 }
 
                 if (peripheral->ISR.getSTOPF()) {				
                     peripheral->ICR.setSTOPCF(1);
-                    if (!peripheral->CR2.getRD_WRN()) {
+                    if (!peripheral->ISR.getDIR()) {
                         applicationEvents::schedule(afterWriteEventId);
                     }                    
                 }                
@@ -82,6 +68,46 @@ namespace i2c {
             virtual void afterWrite() {
             }
 
+        };
+
+        class BufferedSlave: public Slave {
+
+            unsigned char* rxBuffer;
+            unsigned char* txBuffer;
+            int rxSize;
+            int txSize;
+
+        public:
+
+            void init(target::i2c::Peripheral* peripheral, int address, unsigned char* rxBuffer, int rxSize, unsigned char* txBuffer, int txSize) {
+                Slave::init(peripheral, address);
+                this->rxBuffer = rxBuffer;
+                this->rxSize = rxSize;
+                this->txBuffer = txBuffer;
+                this->txSize = txSize;
+            }
+
+            virtual void onRx(int byte, int index) {
+                if (index < rxSize) {
+                    rxBuffer[index] = byte;
+                }
+                if (index == rxSize - 1) {
+                    onRxComplete();
+                }
+            }
+
+            virtual int onTx(int index) {
+                return index < txSize? txBuffer[index]: 0;
+                if (index == txSize - 1) {
+                    onTxComplete();
+                }
+            }
+
+            virtual void onRxComplete() {                
+            }
+
+            virtual void onTxComplete() {                
+            }
         };
     }
 }
