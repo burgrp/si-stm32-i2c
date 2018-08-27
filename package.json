@@ -6,7 +6,8 @@
 	},
 	"silicon": {
 		"sources": [
-			"i2c-hw-master.cpp"
+			"i2c-hw-master.cpp",
+			"i2c-hw-slave.cpp"
 		]
 	}
 }

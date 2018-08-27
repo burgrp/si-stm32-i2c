@@ -5,8 +5,8 @@ namespace i2c {
 
         protected:
             target::i2c::Peripheral* peripheral;
-            int length = 0;
-            int index = 0;
+            int length;
+            int index;
             int stopEventId;
 
             void start(int address, int length, int rdWrn) {
@@ -49,7 +49,7 @@ namespace i2c {
                 }
 
                 if (peripheral->ISR.getTXIS()) {
-                    peripheral->TXDR.setTXDATA(onTx(index));
+                    peripheral->TXDR.setTXDATA(onTx(index++));
                 }
 
                 if (peripheral->ISR.getSTOPF()) {				
