@@ -1,13 +1,12 @@
 namespace i2c {
     namespace hw {
 
-        class Master: public applicationEvents::EventHandler {
+        class Master {
 
         protected:
             target::i2c::Peripheral* peripheral;
             int length;
             int index;
-            int stopEventId;
 
             void start(int address, int length, int rdWrn) {
                 this->length = length;
@@ -33,14 +32,8 @@ namespace i2c {
                 peripheral->CR1.setTXIE(1);
                 peripheral->CR1.setSTOPIE(1);
                 peripheral->CR1.setPE(1);
-                stopEventId = applicationEvents::createEventId();
-                handle(stopEventId);
             }
             
-            virtual void onEvent() {
-                onStop(peripheral->CR2.getRD_WRN(), peripheral->ISR.getNACKF());
-            }
-
             void handleInterrupt() {
 
                 if (peripheral->ISR.getRXNE()) {
@@ -54,7 +47,7 @@ namespace i2c {
 
                 if (peripheral->ISR.getSTOPF()) {				
                     peripheral->ICR.setSTOPCF(1);
-                    applicationEvents::schedule(stopEventId);
+                    onStop(peripheral->CR2.getRD_WRN(), peripheral->ISR.getNACKF());
                 }
                 
             }

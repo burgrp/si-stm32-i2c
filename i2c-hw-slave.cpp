@@ -7,7 +7,6 @@ namespace i2c {
             target::i2c::Peripheral* peripheral;            
             int indexRx;
             int indexTx;
-            int afterWriteEventId;
 
         public:
             
@@ -22,14 +21,9 @@ namespace i2c {
                 peripheral->CR1.setSTOPIE(1);
                 peripheral->CR1.setADDRIE(1);
                 peripheral->CR1.setPE(1);
-
-                afterWriteEventId = applicationEvents::createEventId();
-                handle(afterWriteEventId);
             }
             
-            virtual void onEvent() {
-                afterWrite();
-            }
+
 
             void handleInterrupt() {
 
@@ -52,7 +46,7 @@ namespace i2c {
                 if (peripheral->ISR.getSTOPF()) {				
                     peripheral->ICR.setSTOPCF(1);
                     if (!peripheral->ISR.getDIR()) {
-                        applicationEvents::schedule(afterWriteEventId);
+                        onStop(peripheral->ISR.getDIR());
                     }                    
                 }                
                
@@ -65,13 +59,14 @@ namespace i2c {
                 return 0;
             }
 
-            virtual void afterWrite() {
+            virtual void onStop(bool read) {
             }
 
         };
 
         class BufferedSlave: public Slave {
 
+        protected:
             unsigned char* rxBuffer;
             unsigned char* txBuffer;
             int rxSize;
