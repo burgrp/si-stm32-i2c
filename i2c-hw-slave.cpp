@@ -1,7 +1,7 @@
 namespace i2c {
     namespace hw {
 
-        class Slave: public applicationEvents::EventHandler {
+        class Slave {
 
         protected:
             target::i2c::Peripheral* peripheral;            
