@@ -92,17 +92,26 @@ namespace i2c {
             }
 
             virtual int onTx(int index) {
-                return index < txSize? txBuffer[index]: 0;
+                if (index == 0) {
+                    onTxStart();
+                }
+
                 if (index == txSize - 1) {
                     onTxComplete();
                 }
+
+                return index < txSize? txBuffer[index]: 0;
             }
 
             virtual void onRxComplete() {                
             }
 
+            virtual void onTxStart() {                
+            }
+
             virtual void onTxComplete() {                
             }
+
         };
     }
 }
