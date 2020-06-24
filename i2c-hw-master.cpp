@@ -12,7 +12,7 @@ namespace i2c {
                 this->length = length;
                 this->index = 0;
                 peripheral->ICR.setNACKCF(1);
-                peripheral->CR2.setSADD(address << 1);
+                peripheral->CR2 = address << 1;
                 peripheral->CR2.setNBYTES(length);
                 peripheral->CR2.setRD_WRN(rdWrn);
                 peripheral->CR2.setSTART(1);

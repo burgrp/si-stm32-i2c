@@ -4,13 +4,13 @@ namespace i2c {
         class Slave {
 
         protected:
-            target::i2c::Peripheral* peripheral;            
+            volatile target::i2c::Peripheral* peripheral;            
             int indexRx;
             int indexTx;
 
         public:
             
-            void init(target::i2c::Peripheral* peripheral, int address) {
+            void init(volatile target::i2c::Peripheral* peripheral, int address) {
                 this->peripheral = peripheral;
 
                 peripheral->OAR1.setOA1_1(address);
@@ -74,7 +74,7 @@ namespace i2c {
 
         public:
 
-            void init(target::i2c::Peripheral* peripheral, int address, unsigned char* rxBuffer, int rxSize, unsigned char* txBuffer, int txSize) {
+            void init(volatile target::i2c::Peripheral* peripheral, int address, unsigned char* rxBuffer, int rxSize, unsigned char* txBuffer, int txSize) {
                 Slave::init(peripheral, address);
                 this->rxBuffer = rxBuffer;
                 this->rxSize = rxSize;
