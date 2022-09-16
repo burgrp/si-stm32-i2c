@@ -28,10 +28,10 @@ namespace i2c {
             void handleInterrupt() {
 
                 if (peripheral->ISR.getADDR()) {
-                    peripheral->ICR.setADDRCF(1);
                     indexRx = 0;
                     indexTx = 0;
                     peripheral->ISR.setTXE(1); // clear TX buffer
+                    peripheral->ICR.setADDRCF(1);
                 }
 
                 if (peripheral->ISR.getRXNE()) {
@@ -44,10 +44,10 @@ namespace i2c {
                 }
 
                 if (peripheral->ISR.getSTOPF()) {				
-                    peripheral->ICR.setSTOPCF(1);
                     if (!peripheral->ISR.getDIR()) {
                         onStop(peripheral->ISR.getDIR());
                     }                    
+                    peripheral->ICR.setSTOPCF(1);
                 }                
                
             }
